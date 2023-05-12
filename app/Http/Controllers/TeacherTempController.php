@@ -15,7 +15,6 @@ class TeacherTempController extends Controller
        $checked= $this->checkIfTecherRegsterBefore($request);
        if(isset($checked)){
         return $checked;
-
        }
        $teacher = TeacherTemp::create([
         'name' => $request->name,
@@ -27,7 +26,7 @@ class TeacherTempController extends Controller
     ]);
     return response()->json([
         'status'=>'success',
-        'teacher'=> $teacher,
+        'user'=> $teacher->get(),
         ]);
     }
     public function agreeToAddTeacherToUser(Request $request){
@@ -39,28 +38,34 @@ class TeacherTempController extends Controller
         // }
 
         try {
-            $teacher = TeacherTemp::find($request->id)->first();
+            $teacher = TeacherTemp::find($request->id) ;
+            // return $teacher;
             // $teacher->id = null;
            unset( $teacher->id) ;
            unset( $teacher->created_at) ;
             unset($teacher->updated_at);
+
             $user = User::create($teacher->toArray());
-            $this->delete($request);
-         return response()->json([
+            if(isset($user)){
+                 $this->delete($request);
+                 return response()->json([
              'status'=>'success',
              'teacher'=> $user,
              ]);
+            }
+           
+        
         } catch (\Throwable $th) {
             //throw $th;
             return response()->json([
                 'status'=>'error',
-                'message'=> 'some error evented',
+                'message'=> 'user are created before or duplicated',
                 ]);
         }
       
      }
     public function getAllTeacherTemp(Request $request){
-         $usersTemp = TeacherTemp::all();
+         $usersTemp = TeacherTemp::where('colloge_id',$request->colloge_id)->get();
            return response()->json([
             'status'=>'success',
             'teacher'=> $usersTemp,
@@ -78,9 +83,7 @@ class TeacherTempController extends Controller
             }
     public function delete(Request $request){
        return TeacherTemp::destroy($request->id);
-    // TeacherTemp::withTrashed()
-    //     ->where('id', 1)
-    //     ->restore();
+   
           
     }
 }

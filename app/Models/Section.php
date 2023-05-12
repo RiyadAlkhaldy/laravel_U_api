@@ -20,5 +20,9 @@ class Section extends Model
     {
         return $this->hasMany(Post::class);
     }
+    public function user(): HasMany
+    {
+        return $this->hasMany(User::class);
+    }
 
 }

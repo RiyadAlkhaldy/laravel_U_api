@@ -30,6 +30,13 @@ class UserController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+
+     public function dataDate(Request $request){
+        $date =date("Y/m/d");
+        return base_path();
+       
+        // $request->dataDate;
+     }
     public function getAllUsers(){
         return User::all();
     }

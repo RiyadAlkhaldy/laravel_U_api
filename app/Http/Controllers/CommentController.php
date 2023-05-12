@@ -11,12 +11,12 @@ class CommentController extends Controller
 
 {
     public function __construct(){
-        $this->middleware('auth:api');
+        // $this->middleware('auth:api');
     }
     public function getAllComments(Request $request){
         $data = Post::join('comments','comments.post_id','=','posts.id')
                     ->join('users','users.id','=','comments.user_id')
-        ->where('post_id',$request->post_id)->get(['comments.*','users.name','users.img']);
+        ->where('post_id',$request->post_id)->get(['comments.*','users.name','users.img','users.id as user_id']);
         return  response()->json([
             'status'=>'success',
             'comment'=> $data,]);

@@ -34,10 +34,9 @@ Broadcast::routes(['middleware'=>['auth:api']]);
 
 Route::controller(TeacherTempController::class)->prefix('auth-temp')->group(function () {
 Route::post('create-teacher-temp' ,'createTeacherTemp' ) ;
-
     Route::post('login', 'login');
     Route::post('delete', 'delete');
-    Route::get('get-all-users-tmep', 'getAllTeacherTemp');
+    Route::post('get-all-users-tmep', 'getAllTeacherTemp');
     Route::post('agree-for-teacher', 'agreeToAddTeacherToUser');
     
     
@@ -52,9 +51,6 @@ Route::controller(AuthController::class)->prefix('auth')->group(function () {
     Route::post('logout', 'logout');
     Route::post('refresh', 'refresh');
     Route::post('create-teacher-temp', 'createTeacherTemp');
-    
-    Route::post('eexel', 'eexel');
-    
     Route::get('me', 'me');
 
 });
@@ -65,6 +61,8 @@ Route::controller(UserController::class)->prefix('user')->group(function (){
     Route::post('get-user-posts','getUserPosts');
     Route::post('get-user-posts-by-userid','getUserPostsById');
     Route::post('get-user-by-id','getUserById');
+    Route::get('date','dataDate');
+   
     // getUserById
     //  getCurrentUser profileImage get-user-posts
 
@@ -81,7 +79,6 @@ Route::controller(SectionController::class)->prefix('section')->group(function (
     Route::get('index', 'index');
     Route::post('get-section-posts', 'getSectionPosts');
 
-    
 
 });
 // Route::controller(PostController::class)->prefix('post')->group(function () {

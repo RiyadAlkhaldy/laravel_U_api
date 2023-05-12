@@ -29,19 +29,25 @@ use AuthVerifyAdmin;
         // ]);
         $credentials = $request->only('email', 'password');
 
-        $token = Auth::attempt($credentials);
-        if (!$token) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Unauthorized',
-            ], 401);
-        }
-        //for me
-        $user = User::where( 'email' , $request->email)->first();
-        $user = $this->getUser($user);
-        $token = auth('api')->login($user);
+        $token = Auth('api')->attempt($credentials);
+        // $token = Auth::attempt($credentials);
+        // return $token;
+         
+        // $user = User::where( 'email' ,'=', $request->email)->where('password','=',Hash::make($request->password))->first();
+        $user = Auth('api')->user();
+        // return $user;
 
-        $user = Auth::user();
+$user = $this->getUser($user);
+        // return $user;
+
+        if(isset($user)){
+            // $user = $this->getUser($user);
+            // // $token = Auth::attempt($credentials);
+            // $token = auth('api')->login($user);
+       
+        // $token = auth('api')->login($user);
+
+        // $user = Auth::user();
         return response()->json([ 
                 'status' => 'success',
                 'message' => 'User login successfully',
@@ -51,7 +57,16 @@ use AuthVerifyAdmin;
                     'type' => 'bearer',
                 ]
             ]);
-
+ }
+ return response()->json([ 
+    'status' => 'error',
+    'message' => 'login not success',
+    'user' =>null,
+        'authorisation' => [
+        'token' => null,
+        'type' => 'bearer',
+    ]
+]);
     }
 
 public function register(Request $request){
@@ -80,9 +95,8 @@ public function register(Request $request){
             'colloge_id' => $colloge->id,
             'section_id' => $section->id,
             'university_id' => $verifiedUser->university_id,
-
             'id_number' => $verifiedUser->id_number ,
-            'password' => $verifiedUser->id_number,
+            'password' => Hash::make($verifiedUser->id_number),
             'type'=>$request->type,
         ]);
         $user = $this->getUser($user);
@@ -149,7 +163,9 @@ public function register(Request $request){
             ]);
               }
 
- 
+/*
+create teacher temp
+  */
     public function createTeacherTemp(Request $request){
        $teacher = TeacherTemp::create([
             'name' => $request->name,
@@ -163,6 +179,9 @@ public function register(Request $request){
         return response()->json(['techer'=> $teacher]);
 
     }
+/*
+create colloge or secetion
+  */
     public function registerAdmin(Request $request){
         $userType = 0;
         $checkRegister = $this->checkIfAdminRegsterBefore($request);
@@ -170,38 +189,24 @@ public function register(Request $request){
          return $checkRegister;
           
       $verifiedUser = $this->registerVerifyAdmin($request);
+    //   return $verifiedUser;
       $user =null;
       if(isset($verifiedUser))
-            {
-              $colloge = $this->getColloge($verifiedUser);
-              $section = $this->getSection($verifiedUser);
-              if(!isset($colloge)){
-                 $this->setColloge($verifiedUser);
-                 $colloge = $this->getColloge($verifiedUser);
-                 $userType=4;
-                 $user = User::create([
-                    'name' => $verifiedUser->name,
-                    'email' => $request->email,
-                    'colloge_id' => $colloge->id,
-                    'id_number' => $verifiedUser->id_number ,
-                    'password' => $verifiedUser->password,
-                    'type'=> $userType,
-                ]);
-              }
-              if(!isset($section)){
-                 $this->setSection($verifiedUser,$colloge->id);
-                 $section = $this->getSection($verifiedUser);
-                 $userType=3;
-                 $user = User::create([
-                    'name' => $verifiedUser->name,
-                    'email' => $request->email,
-                    'section_id' => $section->id,
-                    'id_number' => $verifiedUser->id_number ,
-                    'password' => $verifiedUser->password,
-                    'type'=> $userType,
-                ]);
+       {
+         $colloge = $this->getColloge($verifiedUser);
+         $section = $this->getSection($verifiedUser);
+         if(!isset($colloge)){
+            $this->setColloge($verifiedUser);
+            $colloge = $this->getColloge($verifiedUser);
+         }
+         if(!isset($section)){
+            $this->setSection($verifiedUser,$colloge->id);
+            $section = $this->getSection($verifiedUser);
+         }
 
-              }
+        $user= $this->createUserAdmin($request,$verifiedUser,$colloge->id,$section->id);
+            //   return auth('api')->attempt($user);
+            // return $user;
              $user = $this->getUser($user);
              // $token = Auth::attempt($credentials);
              $token = auth('api')->login($user);
@@ -228,10 +233,39 @@ public function register(Request $request){
              ]);
             }
          }
+
+           /*
+              create  User  admin as dean or presindate
+           */
+    private function createUserAdmin(Request $request,$verifiedUser,$colloge_id=null,$section_id=null){
+        if($colloge_id != null){
+             $user= User::create([
+                'name' => $verifiedUser->name,
+                'email' => $request->email,
+                'colloge_id' => $colloge_id  ,
+               //  'section_id' => $section_id??null,
+                'id_number' => $request->id_number ,
+                'password' => Hash::make($request->password),
+                'type'=>$request->type,
+            ]);
+            return $user;
+        }
+       
+
+         return User::create([
+            'name' => $verifiedUser->name,
+            'email' => $request->email,
+            // 'colloge_id' => $colloge_id ,
+            'section_id' => $section_id,
+            'id_number' => $request->id_number ,
+            'password' => Hash::make($request->password),
+            'type'=>$request->type,
+        ]);
+     }
        
     public function logout()
     {
-        Auth::logout();
+        Auth('api')->logout();
         return response()->json([
             'status' => 'success',
             'message' => 'Successfully logged out',

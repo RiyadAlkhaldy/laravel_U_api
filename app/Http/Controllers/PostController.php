@@ -98,9 +98,9 @@ class PostController extends Controller
        $post->numberComments=$numberComments;
        $post->numberLikes=$numberLikes;
        $post->amILike=$amILike;
-       if(isset($post->url)){
-        str_replace("http://10.0.2.2","https://07f4-188-209-253-128.ngrok-free.app",$post->url);
-        }
+    //    if(isset($post->url)){
+    //     str_replace("http://10.0.2.2","https://07f4-188-209-253-128.ngrok-free.app",$post->url);
+    //     }
       array_push($posts,  $post );
      }
     //  https://4f81-178-130-104-122.ngrok-free.app -> http://127.0.0.1:8000
@@ -147,16 +147,17 @@ class PostController extends Controller
           else{
              $post->amILike= 0;
           }
-         array_push($posts,  $post );
-         if(isset($post->user->img)){
-            str_replace("http://10.0.2.2:8000","https://ccd4-176-123-18-166.ngrok-free.app",$post->user->img);
-            str_replace("http://127.0.0.1:8000","https://ccd4-176-123-18-166.ngrok-free.app",$post->user->img);
-            }
-       if(isset($post->url)){
-        str_replace("http://127.0.0.1:8000","https://ccd4-176-123-18-166.ngrok-free.app",$post->url);
+    //      if(isset($post->user->img)){
+    //         str_replace("http://10.0.2.2:8000","https://ccd4-176-123-18-166.ngrok-free.app",$post->user->img);
+    //         str_replace("http://127.0.0.1:8000","https://ccd4-176-123-18-166.ngrok-free.app",$post->user->img);
+    //         }
+    //    if(isset($post->url)){
+    //     str_replace("http://127.0.0.1:8000","https://ccd4-176-123-18-166.ngrok-free.app",$post->url);
 
-        str_replace("http://10.0.2.2:8000","https://ccd4-176-123-18-166.ngrok-free.app",$post->url);
-        }
+    //     str_replace("http://10.0.2.2:8000","https://ccd4-176-123-18-166.ngrok-free.app",$post->url);
+        array_push($posts,  $post );
+
+        // }
     }
         // https://ccd4-176-123-18-166.ngrok-free.app
         return response()->json([
@@ -309,11 +310,13 @@ class PostController extends Controller
     }
     public function delete(Request $request)
     {
-        $post = Post::where('id',$request->id)->delete();
+        $post = Post::where('id',$request->post_id)->delete();
 
-        // Post::
         if(isset($post)){
-            return response()->json(['status'=>'delete']);
+            return response()->json([
+                'status'=>'success',
+                'message'=> 'the post delete',
+            ]);
 
         }
     }

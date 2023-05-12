@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\DB;
 
 trait AuthVerifyAdmin {
   public function checkIfAdminRegsterBefore (Request $request){
-    if(!isset($request->email,$request->id_number,$request->name ,$request->password)){
+    if(!isset($request->email,$request->id_number,$request->password)){
       return  response()->json([
         'status' => 'error',
         'message' => 'أملاء بقية الحقول',
