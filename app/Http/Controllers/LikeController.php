@@ -19,7 +19,11 @@ if(!isset($data)){
         'user_id'=> $userId,
         
         ]);
+        return response()->json(['status'=> 'success',
+                                'message'=> 'The like is done .',
+                                'like'=> $like ]);
         return response()->json([$like]);
+        
 }
     
 return response()->json([ 

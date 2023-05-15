@@ -4,15 +4,21 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Traits\AuthVerifyAdmin;
+// use Illuminate\Auth\Passwords\CanResetPassword;
 use Illuminate\Http\Request;
-
+// use Illuminate\Foundation\Auth\ResetsPasswords;
 class AuthAdminController extends Controller
 {
     use AuthVerifyAdmin;
+    // use ResetsPasswords;
+    // use CanResetPassword;
     public function __construct(){
+        // $this->resetP;
+        
         $this->middleware('auth:api', ['except' => ['login','register','registerTecherOrAdmin','createTeacherTemp']]);
 
     }
+
 
     public function register(Request $request){
         $userType = 0;
@@ -89,5 +95,7 @@ class AuthAdminController extends Controller
            }])
            ->first();
        }
+ 
+ 
 
 }

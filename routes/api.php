@@ -49,6 +49,9 @@ Route::controller(AuthController::class)->prefix('auth')->group(function () {
     Route::post('register-teacher', 'registerTeacher');
     Route::post('register', 'register');
     Route::post('logout', 'logout');
+    Route::post('reset-password', 'resetPassword');
+    Route::post('reset-email', 'resetEmail');
+    
     Route::post('refresh', 'refresh');
     Route::post('create-teacher-temp', 'createTeacherTemp');
     Route::get('me', 'me');
@@ -103,6 +106,7 @@ Route::controller(PostController::class)->prefix('posts') ->group(function (){
 });
 Route::controller(CommentController::class)->prefix('comment')->group(function () {
     Route::post('get-all-comments', 'getAllComments');
+    Route::post('get-all-comments2', 'getAllComments2');
     Route::post('add-comment', 'addComment');
     Route::post('delete-comment', 'deleteComment');
     Route::post('get-number-comments', 'getNumberComments');

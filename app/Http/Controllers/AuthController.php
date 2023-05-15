@@ -125,6 +125,8 @@ public function register(Request $request){
         ]);
        }
     }
+
+
     private function getUser($user){
          return User::where('id', $user->id)
         ->with(['colloge'=> function ($colloge){
@@ -183,7 +185,7 @@ create teacher temp
 create colloge or secetion
   */
     public function registerAdmin(Request $request){
-        $userType = 0;
+        $userType = 3;
         $checkRegister = $this->checkIfAdminRegsterBefore($request);
          if(isset($checkRegister))
          return $checkRegister;
@@ -198,13 +200,15 @@ create colloge or secetion
          if(!isset($colloge)){
             $this->setColloge($verifiedUser);
             $colloge = $this->getColloge($verifiedUser);
+            $userType = 4;
          }
          if(!isset($section)){
             $this->setSection($verifiedUser,$colloge->id);
             $section = $this->getSection($verifiedUser);
+             $userType = 3;
          }
 
-        $user= $this->createUserAdmin($request,$verifiedUser,$colloge->id,$section->id);
+        $user= $this->createUserAdmin($request,$verifiedUser,$colloge->id,$section->id,$userType);
             //   return auth('api')->attempt($user);
             // return $user;
              $user = $this->getUser($user);
@@ -237,7 +241,7 @@ create colloge or secetion
            /*
               create  User  admin as dean or presindate
            */
-    private function createUserAdmin(Request $request,$verifiedUser,$colloge_id=null,$section_id=null){
+    private function createUserAdmin(Request $request,$verifiedUser,$colloge_id=null,$section_id=null,$type){
         if($colloge_id != null){
              $user= User::create([
                 'name' => $verifiedUser->name,
@@ -246,7 +250,7 @@ create colloge or secetion
                //  'section_id' => $section_id??null,
                 'id_number' => $request->id_number ,
                 'password' => Hash::make($request->password),
-                'type'=>$request->type,
+                'type'=> $type,
             ]);
             return $user;
         }
@@ -259,13 +263,148 @@ create colloge or secetion
             'section_id' => $section_id,
             'id_number' => $request->id_number ,
             'password' => Hash::make($request->password),
-            'type'=>$request->type,
+            'type'=> $type,
         ]);
      }
-       
+
+
+     /*
+     resest password
+     */
+    public function resetPassword(Request $request){
+    // $user = User::where('password',$request->old_password)
+    // $user = User::where('password',$request->old_password)->where('email',$request->email)->first();
+
+    $credentials = $request->only('email', 'password');
+
+    $token=  auth('api')->attempt($credentials);
+
+    if($token) {
+    try {
+        $user = Auth('api')->user();
+        // return $user;
+
+        User::where('id',$user->id)->update([
+            'password'=>Hash::make($request->new_password),
+        ]);
+                // get token with new_password
+    $credentials  =array('email'=>$request->email,'password'=>$request->new_password);
+
+    $token=  auth('api')->attempt($credentials);
+        $user = $this->getUser($user);
+        // $token = Auth('api')->refresh();
+        // $user = Auth('api')->user();
+        $user = $this->getUser($user);
+        return response()->json([
+                            'status' => 'success',
+                            'message' => 'Successfully reset password ',
+                            'user'=>$user,
+                            'authorisation' => [
+                                'token' => $token,
+                                'type' => 'bearer',]
+                                ]);
+    } catch (\Throwable $th) {
+        return response()->json([
+            'status' => 'error',
+            'message' => 'error , password not reset .  ',
+            'user'=>null,
+            'authorisation' => [
+                'token' => null,
+                'type' => 'bearer',]
+                ]);
+    }
+    }
+    return response()->json([
+        'status' => 'error',
+        'message' => 'error ,The password not correct .  ',
+        'user'=>null,
+        'authorisation' => [
+            'token' => null,
+            'type' => 'bearer',]
+            ]);
+}
+
+  /*
+     resest Email
+     */
+    public function resetEmail(Request $request){ 
+        $credentials = $request->only('email', 'password');
+        $token=  auth('api')->attempt($credentials);
+    
+        if($token) {
+        try {
+            $user = Auth('api')->user();
+            // return $user;
+            User::where('id',$user->id)->update([
+                'email'=> $request->new_email,
+            ]);
+                    // get token with new_email
+        $credentials  =array('email'=>$request->new_email,'password'=>$request->password);
+    
+        $token=  auth('api')->attempt($credentials);
+            $user = $this->getUser($user);
+            // $token = Auth('api')->refresh();
+            // $user = Auth('api')->user();
+            $user = $this->getUser($user);
+            return response()->json([
+                                'status' => 'success',
+                                'message' => 'Successfully reset Email ',
+                                'user'=>$user,
+                                'authorisation' => [
+                                    'token' => $token,
+                                    'type' => 'bearer',]
+                                    ]);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'error , Email not reset .  ',
+                'user'=>null,
+                'authorisation' => [
+                    'token' => null,
+                    'type' => 'bearer',]
+                    ]);
+        }
+        }
+        return response()->json([
+            'status' => 'error',
+            'message' => 'error ,The password not correct .  ',
+            'user'=>null,
+            'authorisation' => [
+                'token' => null,
+                'type' => 'bearer',]
+                ]);
+    }
+    /* refersh token
+     */
+    public function refershToken(Request $request){
+        // $credentials = $request->only('email', 'old_password');
+        // $token = Auth('api')->attempt($credentials);
+
+
+        $token = Auth('api')->refresh();
+        $user = Auth('api')->user();
+        $user = $this->getUser($user);
+
+// Pass true as the first param to force the token to be blacklisted "forever".
+// The second parameter will reset the claims for the new token
+// $newToken = Auth('api')->refresh(true, true);
+
+return response()->json([
+                    'status' => 'success',
+                    'message' => 'Successfully logged out',
+                    'user'=>$user,
+                    'authorisation' => [
+                        'token' => $token,
+                        'type' => 'bearer',]
+                   ]);
+    }
     public function logout()
     {
         Auth('api')->logout();
+
+// Pass true to force the token to be blacklisted "forever"
+    auth('api')->logout(true);
+        // Auth('api')->logout();
         return response()->json([
             'status' => 'success',
             'message' => 'Successfully logged out',

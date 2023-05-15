@@ -14,12 +14,32 @@ class CommentController extends Controller
         // $this->middleware('auth:api');
     }
     public function getAllComments(Request $request){
-        $data = Post::join('comments','comments.post_id','=','posts.id')
-                    ->join('users','users.id','=','comments.user_id')
-        ->where('post_id',$request->post_id)->get(['comments.*','users.name','users.img','users.id as user_id']);
-        return  response()->json([
-            'status'=>'success',
-            'comment'=> $data,]);
+        $comments = Comment::where('post_id',$request->post_id)
+                    ->with(['user'=> function($user){
+                        $user->select(['id','name','img']);
+                    }])
+                    ->latest()
+                    ->get();
+return  response()->json([
+'status'=>'success',
+'comment'=> $comments]);
+
+
+
+
+
+
+
+
+
+
+
+        // $data = Post::join('comments','comments.post_id','=','posts.id')
+        //             ->join('users','users.id','=','comments.user_id')
+        // ->where('post_id',$request->post_id)->get(['comments.*','users.name','users.img','users.id as user_id']);
+        // return  response()->json([
+        //     'status'=>'success',
+        //     'comment'=> $data,]);
       
         }
     public function getAllComments2(Request $request){
@@ -43,16 +63,27 @@ class CommentController extends Controller
                 'status'=>'success',
                 'numberComments'=> 'null',]);
     }
+
+    /* add comments
+     
+     */
     public function addComment(Request $request){
-        $data = Comment::create([
+        $comment = Comment::create([
         'post_id'=> $request->post_id,
-        'user_id'=> $request->user_id,
+        'user_id'=> Auth('api')->user()->id,
         'comment'=> $request->comment,
 
         ]);
+        $comment= Comment::where('id',$comment->id)
+                    ->with(['user'=> function($user){
+                        $user->select(['id','name','img']);
+                    }])
+                    ->latest()
+                    ->get();
         return response()->json([
             'status'=>'success',
-            'comment'=>  $data,
+            'message'=>'comment added successfuly',
+            'comment'=>  $comment,
             ]);
         }
 public function deleteComment(Request $request){

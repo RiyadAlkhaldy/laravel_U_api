@@ -276,4 +276,43 @@ protected function createFilename(UploadedFile $file)
     $filename =  rand() . time() . "." . $extension;
     return $filename;
 }
+
+
+/*  storage  profile image path in database
+ */
+// private function createPost(Request $request,$response){
+//     if(isset($request->section_id,$request->colloge_id)){
+//       return Post::create([
+//     'content'=>$request->content,
+//     'type'=>$request->type,
+//     'url'=> url($response['link']) ,
+//     'user_id'=>  $request->user_id,
+//     'section_id'=> $request->section_id,
+//     'colloge_id'=>  $request->colloge_id,
+    
+// ]);
+// }
+//       if(isset($request->section_id)){
+//            return Post::create([
+//          'content'=>$request->content,
+//          'type'=>$request->type,
+//          'url'=> url($response['link']) ,
+//          'user_id'=>  $request->user_id,
+//          'section_id'=> $request->section_id,
+//          'colloge_id'=>  $request->colloge_id,
+         
+//      ]);
+//      }
+//      else{
+//          return Post::create([
+//              'content'=>$request->content,
+//              'type'=>$request->type,
+//              'url'=> url($response['link']) ,
+//              'user_id'=>  $request->user_id,
+//              'colloge_id'=>  $request->colloge_id,
+             
+//          ]); 
+//      }
+//   }
+
 }

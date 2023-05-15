@@ -39,8 +39,8 @@ trait AuthVerifyAdmin {
     }
   
     public function registerVerifyAdmin(Request $request ){
-       $student = DB::table('admins')->where('id_number',$request->id_number)->first();
-        return $student;
+       $admin = DB::table('admins')->where('id_number',$request->id_number)->first();
+        return $admin;
     }
    
   //    public function getColloge($query){

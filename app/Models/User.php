@@ -78,6 +78,10 @@ class User extends Authenticatable  implements JWTSubject
      {
          return $this->hasMany(Comment::class);
      }
+     public function like(): HasMany
+     {
+         return $this->hasMany(Like::class);
+     }
      public function scopeGetUser($query){
         return $query->where('email', $this->email );
      }

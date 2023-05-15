@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Events\RealtimePosts;
 use App\Models\Colloge;
 use App\Models\Comment;
+use App\Models\Like;
 use App\Models\Post;
 use App\Models\User;
 use App\Notifications\CreatePost;
@@ -134,18 +135,21 @@ class PostController extends Controller
     $posts=[];
         foreach ($data as   $post) {
            # code...
-          $amILike = Post::where('id',$post->id)
-          ->with(['like'=>function ($like){
-            $like->where('user_id', Auth('api')->user()->id);
+          $amILike = Like::where('post_id',$post->id)->where('user_id',auth('api')->user()->id)
+          ->with(['user'=>function ($like){
+            $like->where('id', Auth('api')->user()->id);
           }])
           ->first();
         //   $post->numberComments=$numberComments;
         //   $post->numberLikes=$amILike;
-          if((int)$amILike[0]>0){
-            $post->amILike= 1;
+        //   if((int)$amILike[0]>0){
+            if( isset($amILike )  ){
+            $post->amILike=1 ;
+            // $post->amILike=$amILike ;
           }
           else{
-             $post->amILike= 0;
+             $post->amILike=  0;
+            //  $post->amILike=  $amILike;
           }
     //      if(isset($post->user->img)){
     //         str_replace("http://10.0.2.2:8000","https://ccd4-176-123-18-166.ngrok-free.app",$post->user->img);
