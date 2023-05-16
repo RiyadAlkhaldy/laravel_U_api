@@ -75,7 +75,7 @@ class ApiController extends Controller
       'content'=>$request->content,
       'type'=>$request->type,
       'url'=> url($response['link']) ,
-      'user_id'=>  $request->user_id,
+      'user_id'=>  auth('api')->user()->id,
       'section_id'=> $request->section_id,
       'colloge_id'=>  $request->colloge_id,
       
@@ -86,7 +86,7 @@ class ApiController extends Controller
            'content'=>$request->content,
            'type'=>$request->type,
            'url'=> url($response['link']) ,
-           'user_id'=>  $request->user_id,
+           'user_id'=> auth('api')->user()->id,
            'section_id'=> $request->section_id,
            'colloge_id'=>  $request->colloge_id,
            
@@ -97,7 +97,7 @@ class ApiController extends Controller
                'content'=>$request->content,
                'type'=>$request->type,
                'url'=> url($response['link']) ,
-               'user_id'=>  $request->user_id,
+               'user_id'=>  auth('api')->user()->id,
                'colloge_id'=>  $request->colloge_id,
                
            ]); 

@@ -197,7 +197,7 @@ create colloge or secetion
        {
          $colloge = $this->getColloge($verifiedUser);
          $section = $this->getSection($verifiedUser);
-         if(!isset($colloge)){
+         if( !isset($colloge)){
             $this->setColloge($verifiedUser);
             $colloge = $this->getColloge($verifiedUser);
             $userType = 4;
@@ -241,8 +241,8 @@ create colloge or secetion
            /*
               create  User  admin as dean or presindate
            */
-    private function createUserAdmin(Request $request,$verifiedUser,$colloge_id=null,$section_id=null,$type){
-        if($colloge_id != null){
+    private function createUserAdmin(Request $request,$verifiedUser,$colloge_id,$section_id,$type){
+        if($colloge_id !== null){
              $user= User::create([
                 'name' => $verifiedUser->name,
                 'email' => $request->email,
@@ -255,7 +255,7 @@ create colloge or secetion
             return $user;
         }
        
-
+if($section_id!==null)
          return User::create([
             'name' => $verifiedUser->name,
             'email' => $request->email,

@@ -186,62 +186,137 @@ class PostController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-
-   
-
-    /**
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function create(Request $request)
-    {
+public function create(Request $request)
+{
+    try {  // create the post
         $post = $this->createPost($request);
+        //get the post after created
+        $post = post::where('id',$post->id)
+        ->where('user_id',auth('api')->user()->id)
+        ->with(['colloge'=> function ($colloge){
+            $colloge->select('id','name');
+        }])
+        ->with(['section'=> function ($section){
+            $section->select('id','name');
+        }])
+        ->with(['user'=> function ($user){
+            $user->select('id','name','img');
+        }])
+        ->withCount('comment')
+        ->withCount('like')->first();
+        # code...
+        $amILike = Like::where('post_id',$post->id)->where('user_id',auth('api')->user()->id)
+        ->with(['user'=>function ($like){
+            $like->where('id', Auth('api')->user()->id);
+        }])
+        ->first();
+            if( isset($amILike )  ){
+            $post->amILike=1 ;
+        }
+        else{
+            $post->amILike=  0;
+        }
         // $users = User::where('id','!=',Auth('api')->user()->id)->get();
-        $users = User::get();
         // $users = User::where('id','!=',Auth('api')->user()->id)->where('colloge_id',$request->colloge_id)->get();
         // $user=Auth('api')->user();
-    
-        
         // $this->sendNotificationsToOthers(  $post,$user);
-
-
         // Notification::send($users,new CreatePost($user_create,$post->id));
         // event(new RealtimePosts(['user_create'=>$user_create,'post_id'=> 'riad' ])) ;
         // broadcast(new RealtimePosts(['user_create'=>$user_create,'post_id'=>$post->id]))->toOthers();
-        return   response()->json([
-            'status' => 'success',
-            'message' => 'Post  created and stored successfully',
-            
-        ]);
-        
+        return response()->json([
+            'status'=>'success',
+            'message' => 'The posts',
+            'posts'=>$post,]);
+    } catch (\Throwable $th) {
+        return response()->json([
+            'status'=>'error',
+            'message' => 'The posts',
+            'posts'=>null,]);
     }
+}
     private function createPost(Request $request){
-        if(isset($request->section_id)){
-             return Post::create([
-           'content'=>$request->content,
-           'type'=>$request->type,
-           'user_id'=>  $request->user_id,
-           'section_id'=> $request->section_id,
-           'colloge_id'=>  $request->colloge_id,
-           
-       ]);
-       }
-       else{
-           return Post::create([
-               'content'=>$request->content,
-               'type'=>$request->type,
-               'user_id'=>  $request->user_id,
-               'colloge_id'=>  $request->colloge_id,
-               
-           ]); 
-       }
+            if(isset($request->section_id)){
+                return Post::create([
+              'content'=>$request->content,
+              'type'=>$request->type,
+              'user_id'=> auth('api')->user()->id,
+              'section_id'=> $request->section_id,
+              'colloge_id'=>  $request->colloge_id,
+              
+          ]);
+          }
+          else{
+              return Post::create([
+                  'content'=>$request->content,
+                  'type'=>$request->type,
+                  'user_id'=>  auth('api')->user()->id,
+                  'colloge_id'=>  $request->colloge_id,
+                  
+              ]); 
+          }
     }
+
+       /**
+     * Show the form for editing the specified resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function edit(Request $request)
+    {
+        try {   // update the post
+             Post::where('id',$request->post_id)
+                ->where('user_id',auth('api')->user()->id)
+                ->update(['content'=>$request->content]);
+                //get the post after update
+             $post = post::where('id',$request->post_id)
+                ->where('user_id',auth('api')->user()->id)
+                ->with(['colloge'=> function ($colloge){
+                 $colloge->select('id','name');
+                }])
+                ->with(['section'=> function ($section){
+                 $section->select('id','name');
+                }])
+                ->with(['user'=> function ($user){
+                 $user->select('id','name','img');
+                }])
+                ->withCount('comment')
+                ->withCount('like')
+             ->first();
+         
+                # code...
+                $amILike = Like::where('post_id',$post->id)->where('user_id',auth('api')->user()->id)
+                ->with(['user'=>function ($like){
+                    $like->where('id', Auth('api')->user()->id);
+                }])
+                ->first();
+                    if( isset($amILike )  ){
+                    $post->amILike=1 ;
+                }
+                else{
+                    $post->amILike=  0;
+                }
+                //  array_push($posts,  $post );
+                 return response()->json([
+                     'status'=>'success',
+                     'message' => 'The posts',
+                     'posts'=>$post,]);
+             
+
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status'=>'error',
+                'message' => 'The posts',
+                'posts'=>null,]);
+        }
+    }
+
+            /* send notifications to others users
+            */
     private function sendNotificationsToOthers(Post $post,$user){
         // broadcast(new RealtimePosts( $post, $user))->toOthers();
         broadcast(new RealtimePosts( $post, $user));
@@ -288,17 +363,7 @@ class PostController extends Controller
         
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Post  $post
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Post $post)
-    {
-        return 'edit';
-        
-    }
+ 
  
     public function update(Request $request, Post $post)
     {
