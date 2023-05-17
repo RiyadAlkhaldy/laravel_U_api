@@ -61,7 +61,8 @@ class ApiController extends Controller
             //
             return response()->json([
                 'status' => 'success',
-                'link' => url($response['link']),
+                'link' => $response['link'],
+                // 'link' => url($response['link']),
                 'mime_type' => url($response['mime_type']),
                 'extension' => url($response['extension']),
                 'message' => 'File successfully uploaded.'
@@ -74,7 +75,8 @@ class ApiController extends Controller
         return Post::create([
       'content'=>$request->content,
       'type'=>$request->type,
-      'url'=> url($response['link']) ,
+      'url'=> $response['link'] ,
+      // 'url'=> url($response['link']) ,
       'user_id'=>  auth('api')->user()->id,
       'section_id'=> $request->section_id,
       'colloge_id'=>  $request->colloge_id,
@@ -85,7 +87,8 @@ class ApiController extends Controller
              return Post::create([
            'content'=>$request->content,
            'type'=>$request->type,
-           'url'=> url($response['link']) ,
+           'url'=> $response['link'] ,
+          //  'url'=> url($response['link']) ,
            'user_id'=> auth('api')->user()->id,
            'section_id'=> $request->section_id,
            'colloge_id'=>  $request->colloge_id,
@@ -96,7 +99,8 @@ class ApiController extends Controller
            return Post::create([
                'content'=>$request->content,
                'type'=>$request->type,
-               'url'=> url($response['link']) ,
+               'url'=> $response['link'] ,
+              //  'url'=> url($response['link']) ,
                'user_id'=>  auth('api')->user()->id,
                'colloge_id'=>  $request->colloge_id,
                

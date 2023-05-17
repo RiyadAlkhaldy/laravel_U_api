@@ -1,9 +1,6 @@
 <?php
 
 namespace App\Http\Controllers;
-
-
-
 use App\Models\TeacherTemp;
 use App\Traits\AuthVerify;
 use Illuminate\Http\Request;
@@ -70,12 +67,12 @@ $user = $this->getUser($user);
     }
 
 public function register(Request $request){
-   $checkRegister = $this->checkIfUserRegsterBefore (  $request);
+  try {
+    $checkRegister = $this->checkIfUserRegsterBefore (  $request);
     if(isset($checkRegister))
     return $checkRegister;
      
  $verifiedUser = $this->registerVerify($request);
-
  if(isset($verifiedUser))
        {
          $colloge = $this->getColloge($verifiedUser);
@@ -113,8 +110,7 @@ public function register(Request $request){
         ]);
        }
        else {
-        return 
-        response()->json([
+       return response()->json([
             'status' => 'error',
             'message' => 'User not created  ',
             'user' => null,
@@ -124,6 +120,17 @@ public function register(Request $request){
             ],200
         ]);
        }
+  } catch (\Throwable $th) {
+    return response()->json([
+        'status' => 'error',
+        'message' => 'User not created  ',
+        'user' => null,
+        'authorisation' => [
+            'token' => null,
+            'type' => 'bearer',
+        ],200
+    ]);
+  }
     }
 
 
@@ -195,20 +202,24 @@ create colloge or secetion
       $user =null;
       if(isset($verifiedUser))
        {
-         $colloge = $this->getColloge($verifiedUser);
-         $section = $this->getSection($verifiedUser);
+         $colloge = $this->getCollogeadmin($verifiedUser);
+         $section = $this->getSectionAdmin($verifiedUser);
          if( !isset($colloge)){
-            $this->setColloge($verifiedUser);
-            $colloge = $this->getColloge($verifiedUser);
-            $userType = 4;
+            $this->setCollogeAdmin($verifiedUser);
+            $colloge = $this->getCollogeadmin($verifiedUser);
+            $userType = 3;
          }
          if(!isset($section)){
-            $this->setSection($verifiedUser,$colloge->id);
-            $section = $this->getSection($verifiedUser);
-             $userType = 3;
+            if($verifiedUser->section != null){
+                $this->setSectionAdmin($verifiedUser,$colloge->id);
+                $section = $this->getSectionAdmin($verifiedUser);
+                 $userType = 4;
+            }
+         
          }
 
-        $user= $this->createUserAdmin($request,$verifiedUser,$colloge->id,$section->id,$userType);
+        // return $this->createUserAdmin($request,$verifiedUser,$colloge,$section,$userType);
+        $user= $this->createUserAdmin($request,$verifiedUser,$colloge,$section,$userType);
             //   return auth('api')->attempt($user);
             // return $user;
              $user = $this->getUser($user);
@@ -241,12 +252,12 @@ create colloge or secetion
            /*
               create  User  admin as dean or presindate
            */
-    private function createUserAdmin(Request $request,$verifiedUser,$colloge_id,$section_id,$type){
-        if($colloge_id !== null){
+    private function createUserAdmin(Request $request,$verifiedUser,$colloge,$section,$type){
+        if($colloge !== null ){
              $user= User::create([
                 'name' => $verifiedUser->name,
                 'email' => $request->email,
-                'colloge_id' => $colloge_id  ,
+                'colloge_id' => $colloge->id  ,
                //  'section_id' => $section_id??null,
                 'id_number' => $request->id_number ,
                 'password' => Hash::make($request->password),
@@ -255,12 +266,12 @@ create colloge or secetion
             return $user;
         }
        
-if($section_id!==null)
+if($section !==null)
          return User::create([
             'name' => $verifiedUser->name,
             'email' => $request->email,
             // 'colloge_id' => $colloge_id ,
-            'section_id' => $section_id,
+            'section_id' => $section->id,
             'id_number' => $request->id_number ,
             'password' => Hash::make($request->password),
             'type'=> $type,

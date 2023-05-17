@@ -124,7 +124,7 @@ class PostController extends Controller
         $section->select('id','name');
        }])
        ->with(['user'=> function ($user){
-        $user->select('id','name','img');
+        $user->select('id','name','img','type');
        }])
        ->withCount('comment')
        ->withCount('like')
@@ -282,7 +282,7 @@ public function create(Request $request)
                  $section->select('id','name');
                 }])
                 ->with(['user'=> function ($user){
-                 $user->select('id','name','img');
+                 $user->select('id','name','img','type');
                 }])
                 ->withCount('comment')
                 ->withCount('like')

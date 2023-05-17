@@ -53,7 +53,7 @@ class UserController extends Controller
             $section->select('id','name');
            }])
            ->with(['user'=> function ($user){
-            $user->select('id','name','img');
+            $user->select('id','name','img','type');
            }])
            ->withCount('comment')
            ->withCount('like')
@@ -100,7 +100,7 @@ public function getUserPostsById(Request $request){
         $section->select('id','name');
        }])
        ->with(['user'=> function ($user){
-        $user->select('id','name','img');
+        $user->select('id','name','img','type');
        }])
        ->withCount('comment')
        ->withCount('like')
@@ -162,7 +162,7 @@ public function getUserPostsById(Request $request){
         //     $user->update(['status' =>1]);
         // }
             ActiveUserJob::dispatch();
-        
+         
         return 'job successfully';
     }
     /**
@@ -222,7 +222,7 @@ public function getUserPostsById(Request $request){
             //your data insert code
             // $link = str_split()
            User::where('id',$request->user_id)->update([
-                'img'=> url($response['link']) ,
+                'img'=> $response['link'] ,
                 
             ]);
 
@@ -235,7 +235,7 @@ public function getUserPostsById(Request $request){
   
             return response()->json([
                 'status' => 'success',
-                'link' => url($response['link']),
+                'link' => $response['link'],
                 'mime_type' => url($response['mime_type']),
                 'extension' => url($response['extension']),
                 'message' => 'File successfully uploaded.'

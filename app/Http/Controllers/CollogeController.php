@@ -20,7 +20,7 @@ class CollogeController extends Controller
         $section->select('id','name');
        }])
        ->with(['user'=> function ($user){
-        $user->select('id','name','img');
+        $user->select('id','name','img','type');
        }])
        ->withCount('comment')
        ->withCount('like')

@@ -43,6 +43,44 @@ trait AuthVerifyAdmin {
         return $admin;
     }
    
+    public function getCollogeadmin($query){
+      $admin =  Colloge::where('name',$query->colloge)->first();
+      // if(isset($admin)){
+        return $admin;
+      //  }
+      //  else {
+      //   return null;
+      //  }
+    }
+     
+    public function setCollogeAdmin($query){
+      if(isset($query->colloge)){
+      $colloge =  Colloge::where(['name'=>$query->colloge])->first();
+        if(!isset( $colloge))
+        Colloge::create(['name'=>$query->colloge]);
+      }
+      }
+        public function getSectionAdmin($query){
+      $admin = Section::where('name',$query->section)->first();
+      if(isset($admin)){
+        return $admin;
+       }
+       else {
+        return null;
+       }
+        }
+
+        public function setSectionAdmin($query,$id){
+          if(isset($query->section)){
+            // if(isset($id))
+         $section = Section::where(['name'=>$query->section,'colloge_id'=>$id])->first();
+         if(!isset($section))
+          Section::create(['name'=>$query->section,'colloge_id'=>$id]);
+
+
+          }
+      
+              }
   //    public function getColloge($query){
   //     return Colloge::where('name',$query->colloge)->first();
   //   }

@@ -16,7 +16,7 @@ class CommentController extends Controller
     public function getAllComments(Request $request){
         $comments = Comment::where('post_id',$request->post_id)
                     ->with(['user'=> function($user){
-                        $user->select(['id','name','img']);
+                        $user->select(['id','name','img','type']);
                     }])
                     ->latest()
                     ->get();
@@ -76,7 +76,7 @@ return  response()->json([
         ]);
         $comment= Comment::where('id',$comment->id)
                     ->with(['user'=> function($user){
-                        $user->select(['id','name','img']);
+                        $user->select(['id','name','img','type']);
                     }])
                     ->latest()
                     ->get();

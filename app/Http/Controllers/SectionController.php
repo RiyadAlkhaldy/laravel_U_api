@@ -12,7 +12,7 @@ class SectionController extends Controller
 {
     public function getSectionPosts(Request $request){
         // $data = post::where('colloge_id',$request->colloge_id)
-        $data = post::where('section_id',1)
+        $data = post::where('section_id',$request->section_id)
        ->with(['colloge'=> function ($colloge){
         $colloge->select('id','name');
        }])
@@ -20,7 +20,7 @@ class SectionController extends Controller
         $section->select('id','name');
        }])
        ->with(['user'=> function ($user){
-        $user->select('id','name','img');
+        $user->select('id','name','img','type');
        }])
        ->withCount('comment')
        ->withCount('like')
