@@ -177,7 +177,7 @@ public function getUserPostsById(Request $request){
     //   })->where('id',Auth('api')->user()->id)->first();
     
     $user=  User::with('post', function($post){
-        //    $post->find(1)->comment ;
+           $post->find(1)->comment ;
       })->where('id',Auth('api')->user()->id)->first();
         return response()->json([
             'status'=>'success',

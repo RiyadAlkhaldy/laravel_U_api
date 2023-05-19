@@ -36,13 +36,13 @@ class PostController extends Controller
             $section->select('id','name');
            }])
            ->with(['user'=> function ($user){
-            $user->select('id','name','img');
+            $user->select('id','name','img','type');
            }])
            ->withCount('comment')
            ->withCount('like')
            ->latest()
         // ->get();
-        ->paginate(20);
+        ->paginate(5);
         // ->simplePaginate(20);
         $posts=[];
             foreach ($data as   $post) {
@@ -128,7 +128,7 @@ class PostController extends Controller
        }])
        ->withCount('comment')
        ->withCount('like')
-       ->latest()->take(50)
+       ->latest()->take(2)
     ->get();
 
     // ->simplePaginate(20);
@@ -221,10 +221,10 @@ public function create(Request $request)
         else{
             $post->amILike=  0;
         }
-        // $users = User::where('id','!=',Auth('api')->user()->id)->get();
+        $users = User::where('id','!=',Auth('api')->user()->id)->get();
         // $users = User::where('id','!=',Auth('api')->user()->id)->where('colloge_id',$request->colloge_id)->get();
-        // $user=Auth('api')->user();
-        // $this->sendNotificationsToOthers(  $post,$user);
+        $user=Auth('api')->user();
+        $this->sendNotificationsToOthers(  $post,$user);
         // Notification::send($users,new CreatePost($user_create,$post->id));
         // event(new RealtimePosts(['user_create'=>$user_create,'post_id'=> 'riad' ])) ;
         // broadcast(new RealtimePosts(['user_create'=>$user_create,'post_id'=>$post->id]))->toOthers();
@@ -236,7 +236,8 @@ public function create(Request $request)
         return response()->json([
             'status'=>'error',
             'message' => 'The posts',
-            'posts'=>null,]);
+            'posts'=>null,
+            'error'=>$th]);
     }
 }
     private function createPost(Request $request){
@@ -311,15 +312,16 @@ public function create(Request $request)
             return response()->json([
                 'status'=>'error',
                 'message' => 'The posts',
-                'posts'=>null,]);
+                'posts'=>null,
+                'errer'=>$th]);
         }
     }
 
             /* send notifications to others users
             */
     private function sendNotificationsToOthers(Post $post,$user){
-        // broadcast(new RealtimePosts( $post, $user))->toOthers();
-        broadcast(new RealtimePosts( $post, $user));
+        broadcast(new RealtimePosts( $post, $user))->toOthers();
+        // broadcast(new RealtimePosts( $post, $user));
         // event(new RealtimePosts( $post, $user));
 
     }
